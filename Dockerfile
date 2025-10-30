@@ -1,10 +1,18 @@
-# 使用官方 WordPress 映像
-FROM wordpress:latest
+# 使用官方 Anaconda 映像
+FROM continuumio/anaconda3
 
-# 安裝額外套件或自訂設定(可選)
-# RUN apt-get update && apt-get install -y some-package
+# 設定工作目錄
+WORKDIR /workspace
 
-# 複製自訂主題或外掛(可選)
-# COPY ./my-theme /var/www/html/wp-content/themes/my-theme
+# 複製你的 Jupyter Book 專案(如果有)
+# COPY ./mybook /workspace/mybook
 
-# 設定 WordPress 啟動時的環境變數(通常在 docker-compose.yml 設定)
+# 更新 pip 並安裝 jupyter-book,忽略 root 使用者警告
+RUN pip install --upgrade pip \
+    && pip install jupyter-book --root-user-action=ignore
+
+# 開放 port 8000 給外部訪問
+EXPOSE 8000
+
+# 預設啟動 Jupyter Book(假設你的書本在 mybook 資料夾)
+CMD ["jupyter-book", "serve", "mybook", "--port", "8000", "--watch"]
