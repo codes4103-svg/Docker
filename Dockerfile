@@ -1,18 +1,24 @@
-# 使用官方 Anaconda 映像
-FROM continuumio/anaconda3
+# This is a standard Dockerfile for building a Go app.
+# It is a multi-stage build: the first stage compiles the Go source into a binary, and
+#   the second stage copies only the binary into an alpine base.
 
-# 設定工作目錄
-WORKDIR /workspace
+# -- Stage 1 -- #
+# Compile the app.
+FROM golang:1.22-alpine as builder
+WORKDIR /app
+# The build context is set to the directory where the repo is cloned.
+# This will copy all files in the repo to /app inside the container.
+# If your app requires the build context to be set to a subdirectory inside the repo, you
+#   can use the source_dir app spec option, see: https://www.digitalocean.com/docs/app-platform/references/app-specification-reference/
+COPY . .
+RUN go build -mod=vendor -o bin/hello
 
-# 複製你的 Jupyter Book 專案(如果有)
-# COPY ./mybook /workspace/mybook
-
-# 更新 pip 並安裝 jupyter-book,忽略 root 使用者警告
-RUN pip install --upgrade pip \
-    && pip install jupyter-book --root-user-action=ignore
-
-# 開放 port 8000 給外部訪問
-EXPOSE 8000
-
-# 預設啟動 Jupyter Book(假設你的書本在 mybook 資料夾)
-CMD ["jupyter-book", "serve", "mybook", "--port", "8000", "--watch"]
+# -- Stage 2 -- #
+# Create the final environment with the compiled binary.
+FROM alpine:3.20
+# Install any required dependencies.
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+# Copy the binary from the builder stage and set it as the default command.
+COPY --from=builder /app/bin/hello /usr/local/bin/
+CMD ["hello"]
