@@ -1,21 +1,21 @@
-# 使用官方 Node.js 映像作為基礎
-FROM node:18
+# 使用官方 Python 基礎映像
+FROM python:3.11-slim
 
 # 設定工作目錄
 WORKDIR /app
 
-# 複製 package.json 和 package-lock.json（如果有）
-COPY package*.json ./
+# 複製 Flask 檔案到容器中
+COPY app.py /app
 
-# 安裝依賴
-RUN npm install
+# 安裝 Flask
+RUN pip install flask
 
-# 複製應用程式原始碼
-COPY . .
+# 設定環境變數
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
 
-# 開放應用程式使用的 port（例如 3000）
-EXPOSE 3000
+# 開放 Flask 預設埠
+EXPOSE 5000
 
-# 啟動應用程式（假設是用 npm start）
-CMD ["npm", "start"]
-
+# 啟動 Flask 應用
+CMD ["flask", "run"]
