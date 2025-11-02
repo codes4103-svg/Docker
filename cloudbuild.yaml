@@ -28,7 +28,6 @@ steps:
 
 serviceAccount: 'projects/causal-shell-289917/serviceAccounts/my-custom-sa@causal-shell-289917.iam.gserviceaccount.com'
 
-options:
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+logsBucket: 'gs://causal-shell-289917-cloudbuild-logs'
 
 timeout: '900s'
