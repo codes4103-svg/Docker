@@ -1,0 +1,3 @@
+docker build \
+    -t gcr.io/causal-shell-289917/github.com/codes4103-svg/docker:$COMMIT_SHA \
+    .
