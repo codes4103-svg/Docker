@@ -1,3 +1,34 @@
-docker build \
-    -t gcr.io/causal-shell-289917/github.com/codes4103-svg/docker:$COMMIT_SHA \
-    .
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/causal-shell-289917/github.com/codes4103-svg/docker:$COMMIT_SHA',
+        '.'
+      ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        'gcr.io/causal-shell-289917/github.com/codes4103-svg/docker:$COMMIT_SHA'
+      ]
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      [
+        'run', 'deploy', 'codes4103-svg',
+        '--image', 'gcr.io/causal-shell-289917/github.com/codes4103-svg/docker:$COMMIT_SHA',
+        '--region', 'asia-east1',
+        '--platform', 'managed',
+        '--allow-unauthenticated'
+      ]
+
+serviceAccount: 'projects/causal-shell-289917/serviceAccounts/my-custom-sa@causal-shell-289917.iam.gserviceaccount.com'
+
+options:
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+
+timeout: '900s'
