@@ -7,15 +7,11 @@ WORKDIR /app
 # 複製 Flask 檔案到容器中
 COPY app.py /app
 
-# 安裝 Flask
-RUN pip install flask
+# 安裝必要套件
+RUN pip install flask gunicorn
 
-# 設定環境變數
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
+# 開放 Cloud Run 預設埠
+EXPOSE 8080
 
-# 開放 Flask 預設埠
-EXPOSE 5000
-
-# 啟動 Flask 應用
-CMD ["flask", "run"]
+# 啟動 Flask 應用（使用 gunicorn）
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
